@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Таблица полей</title>
+    <style>
+        table, th, td {
+            border: 1px solid black;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 10px;
+        }
+        .invalid {
+            border-color: red;
+        }
+    </style>
+</head>
+
+<body>
+
+    <button onclick="addRow()" id="addRowButton">Добавить строку в начало</button>
+
+    <table id="mainTable">
+        <thead>
+            <tr>
+                <th>Actions</th>
+                <th>ID</th>
+                <th>Type</th>
+                <th>Step text</th>
+                <th>Answer text</th>
+                <th>Answer json</th>
+                <th>Step text with answer</th>
+                <th>Next step ID</th>
+                <th>Almost correct</th>
+                <th>Set conditions</th>
+                <th>Photo</th>
+                <th>Comment</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>
+                    <button onclick="addRowBelow(this)" id="addRowBelow">&#43</button>
+                    <button onclick="removeRow(this)" id="removeRow">-</button>
+                    <button onclick="moveUp(this)" id="moveUp">&#8593</button>
+                    <button onclick="moveDown(this)" id="moveDown">&#8595</button>
+                </td>
+                <td><input type="number" name="id" placeholder="ID"></td>
+                <td>
+                    <select name="type" onchange="validateType(this)">
+                        <option value="--">--</option>
+                        <option value="open_question">open_question</option>
+                        <option value="need_help">need_help</option>
+                        <option value="choosing">choosing</option>
+                        <option value="portioning">portioning</option>
+                        <option value="closed_question">closed_question</option>
+                        <option value="theory">theory</option>
+                        <option value="final_training">final_training</option>
+                        <option value="sticker">sticker</option>
+                        <option value="gif">gif</option>
+                        <option value="teacher_reaction">teacher_reaction</option>
+                        <option value="stickersgifs">stickersgifs</option>
+                        <option value="set_of_additional_tasks">set_of_additional_tasks</option>
+                    </select>
+                </td>
+                <td><textarea id="stepText" name="stepText" rows="1" cols="20" placeholder="Step text" disabled></textarea></td>
+                <td><input type="text" name="answerText" placeholder="Answer text" disabled></td>
+                <td><input type="text" name="answerJson" placeholder='["isn&#39;t", "is not"]' disabled oninput="validateFields()"></td>
+                <td><input type="text" name="stepTextWithAnswer" placeholder="Step text with answer" disabled></td>
+                <td><input type="text" name="nextStepID" placeholder="Next step ID" disabled oninput="validateFields()"></td>
+                <td><input type="text" name="almostCorrect" placeholder='{"wrong answer": ["correct answer"]}' disabled oninput="validateFields()"></td>
+                <td><input type="text" name="setConditions" placeholder='{"key":"value"}' disabled oninput="validateFields()"></td>
+                <td>
+                    <div class="photo-thumbnails"></div>
+                    <input type="file" name="photo" accept="image/*" multiple disabled onchange="displayThumbnails(this)">
+                </td>
+                <td><textarea name="comment" rows="1" cols="20" placeholder="Add comment..."></textarea></td>            
+            </tr>
+        </tbody>
+    </table>
+
+    <script>
+        function addRow() {
+            const table = document.getElementById("mainTable").getElementsByTagName('tbody')[0];
+            const newRow = table.insertRow(0);
+
+            newRow.innerHTML = `
+                <td>
+                    <button onclick="addRowBelow(this)" id="addRowBelow">&#43</button>
+                    <button onclick="removeRow(this)" id="removeRow">-</button>
+                    <button onclick="moveUp(this)" id="moveUp">&#8593</button>
+                    <button onclick="moveDown(this)" id="moveDown">&#8595</button>
+                </td>
+                <td><input type="number" name="id" placeholder="ID"></td>
+                <td>
+                    <select name="type" onchange="validateType(this)">
+                        <option value="--">--</option>
+                        <option value="open_question">open_question</option>
+                        <option value="need_help">need_help</option>
+                        <option value="choosing">choosing</option>
+                        <option value="portioning">portioning</option>
+                        <option value="closed_question">closed_question</option>
+                        <option value="theory">theory</option>
+                        <option value="final_training">final_training</option>
+                        <option value="sticker">sticker</option>
+                        <option value="gif">gif</option>
+                        <option value="teacher_reaction">teacher_reaction</option>
+                        <option value="stickersgifs">stickersgifs</option>
+                        <option value="set_of_additional_tasks">set_of_additional_tasks</option>
+                    </select>
+                </td>
+                <td><textarea name="stepText" rows="1" cols="20" placeholder="Step text" disabled></textarea></td>
+                <td><input type="text" name="answerText" placeholder="Answer text" disabled></td>
+                <td><input type="text" name="answerJson" placeholder='["isn&#39;t", "is not"]' disabled oninput="validateFields()"></td>
+                <td><input type="text" name="stepTextWithAnswer" placeholder="Step text with answer" disabled></td>
+                <td><input type="text" name="nextStepID" placeholder="Next step ID" disabled oninput="validateFields()"></td>
+                <td><input type="text" name="almostCorrect" placeholder='{"wrong answer": ["correct answer"]}' disabled oninput="validateFields()"></td>
+                <td><input type="text" name="setConditions" placeholder='{"key":"value"}' disabled oninput="validateFields()"></td>
+                <td>
+                    <div class="photo-thumbnails"></div>
+                    <input type="file" name="photo" accept="image/*" multiple disabled onchange="displayThumbnails(this)">
+                </td>
+                <td><textarea name="comment" rows="1" cols="20" placeholder="Add comment..."></textarea></td>`;
+
+            validateFields();
+        }
+        
+        function addRowBelow(btnElement) {
+            const table = document.getElementById("mainTable").getElementsByTagName('tbody')[0];
+            const newRow = table.insertRow(btnElement.closest("tr").rowIndex);
+
+            newRow.innerHTML = `
+                <td>
+                    <button onclick="addRowBelow(this)" id="addRowBelow">&#43</button>
+                    <button onclick="removeRow(this)" id="removeRow">-</button>
+                    <button onclick="moveUp(this)" id="moveUp">&#8593</button>
+                    <button onclick="moveDown(this)" id="moveDown">&#8595</button>
+                </td>
+                <td><input type="number" name="id" placeholder="ID"></td>
+                <td>
+                    <select name="type" onchange="validateType(this)">
+                        <option value="--">--</option>
+                        <option value="open_question">open_question</option>
+                        <option value="need_help">need_help</option>
+                        <option value="choosing">choosing</option>
+                        <option value="portioning">portioning</option>
+                        <option value="closed_question">closed_question</option>
+                        <option value="theory">theory</option>
+                        <option value="final_training">final_training</option>
+                        <option value="sticker">sticker</option>
+                        <option value="gif">gif</option>
+                        <option value="teacher_reaction">teacher_reaction</option>
+                        <option value="stickersgifs">stickersgifs</option>
+                        <option value="set_of_additional_tasks">set_of_additional_tasks</option>
+                    </select>
+                </td>
+                <td><textarea name="stepText" rows="1" cols="20" placeholder="Step text" disabled></textarea></td>
+                <td><input type="text" name="answerText" placeholder="Answer text" disabled></td>
+                <td><input type="text" name="answerJson" placeholder='["isn&#39;t", "is not"]' disabled oninput="validateFields()"></td>
+                <td><input type="text" name="stepTextWithAnswer" placeholder="Step text with answer" disabled></td>
+                <td><input type="text" name="nextStepID" placeholder="Next step ID" disabled oninput="validateFields()"></td>
+                <td><input type="text" name="almostCorrect" placeholder='{"wrong answer": ["correct answer"]}' disabled oninput="validateFields()"></td>
+                <td><input type="text" name="setConditions" placeholder='{"key":"value"}' disabled oninput="validateFields()"></td>
+                <td>
+                    <div class="photo-thumbnails"></div>
+                    <input type="file" name="photo" accept="image/*" multiple disabled onchange="displayThumbnails(this)">
+                </td>
+                <td><textarea name="comment" rows="1" cols="20" placeholder="Add comment..."></textarea></td>`;
+
+            validateFields();
+        }
+
+        function moveUp(btnElement) {
+            const row = btnElement.closest("tr");
+            const previousRow = row.previousElementSibling;
+            if (previousRow) row.parentNode.insertBefore(row, previousRow);
+        }
+
+        function moveDown(btnElement) {
+            const row = btnElement.closest("tr");
+            const nextRow = row.nextElementSibling;
+            if (nextRow) row.parentNode.insertBefore(nextRow, row);
+        }
+
+        function validateType(selectElement) {
+            const row = selectElement.closest("tr");
+
+            const fields = {
+                "id": row.querySelector('input[name="id"]'),
+                "stepText": row.querySelector('textarea[name="stepText"]'),
+                "answerText": row.querySelector('input[name="answerText"]'),
+                "answerJson": row.querySelector('input[name="answerJson"]'),
+                "stepTextWithAnswer": row.querySelector('input[name="stepTextWithAnswer"]'),
+                "nextStepID": row.querySelector('input[name="nextStepID"]'),
+                "almostCorrect": row.querySelector('input[name="almostCorrect"]'),
+                "photo": row.querySelector('input[name="photo"]'),
+                "comment": row.querySelector('textarea[name="comment"]'),
+                "setConditions": row.querySelector('input[name="setConditions"]')
+            };
+
+            const allFields = row.querySelectorAll('input, select, textarea');
+
+            // Сначала деактивируем все поля
+            allFields.forEach(field => {
+                if (field.name !== 'type') {
+                    field.setAttribute('disabled', 'true');
+                }
+            });
+
+            if (selectElement.value === 'open_question') {
+                const fieldsToEnableForOpenQuestion = ["id", "stepText", "answerText", "answerJson", "stepTextWithAnswer", "nextStepID", "almostCorrect", "photo", "comment"];
+                fieldsToEnableForOpenQuestion.forEach(fieldName => fields[fieldName].removeAttribute('disabled'));
+            } 
+            else if (selectElement.value === 'need_help') {
+                const fieldsToEnableForNeedHelp = ["id", "nextStepID"];
+                fieldsToEnableForNeedHelp.forEach(fieldName => fields[fieldName].removeAttribute('disabled'));
+            } 
+            else if (selectElement.value === 'choosing') {
+                const fieldsToEnableForNeedHelp = ["id", "stepText", "answerJson", "nextStepID", "comment"];
+                fieldsToEnableForNeedHelp.forEach(fieldName => fields[fieldName].removeAttribute('disabled'));
+            } 
+            else if (selectElement.value === 'portioning') {
+                const fieldsToEnableForNeedHelp = ["id", "stepText", "answerText", "answerJson", "nextStepID", "comment"];
+                fieldsToEnableForNeedHelp.forEach(fieldName => fields[fieldName].removeAttribute('disabled'));
+            } 
+            else if (selectElement.value === 'closed_question') {
+                const fieldsToEnableForNeedHelp = ["id", "stepText", "answerText", "answerJson", "stepTextWithAnswer", "nextStepID", "photo", "comment"];
+                fieldsToEnableForNeedHelp.forEach(fieldName => fields[fieldName].removeAttribute('disabled'));
+            } 
+            else if (selectElement.value === 'theory') {
+                const fieldsToEnableForNeedHelp = ["id", "stepText", "nextStepID", "photo", "comment"];
+                fieldsToEnableForNeedHelp.forEach(fieldName => fields[fieldName].removeAttribute('disabled'));
+            } 
+            else if (selectElement.value === 'final_training') {
+                const fieldsToEnableForNeedHelp = ["id", "stepText", "nextStepID", "comment"];
+                fieldsToEnableForNeedHelp.forEach(fieldName => fields[fieldName].removeAttribute('disabled'));
+            }
+            else if (selectElement.value === 'sticker') {
+                const fieldsToEnableForNeedHelp = ["id", "stepText", "nextStepID", "photo", "comment"];
+                fieldsToEnableForNeedHelp.forEach(fieldName => fields[fieldName].removeAttribute('disabled'));
+            } 
+            else if (selectElement.value === 'gif') {
+                const fieldsToEnableForNeedHelp = ["id", "stepText", "nextStepID", "comment"];
+                fieldsToEnableForNeedHelp.forEach(fieldName => fields[fieldName].removeAttribute('disabled'));
+            }
+            else if (selectElement.value === 'teacher_reaction') {
+                const fieldsToEnableForNeedHelp = ["id", "stepText", "nextStepID", "comment"];
+                fieldsToEnableForNeedHelp.forEach(fieldName => fields[fieldName].removeAttribute('disabled'));
+            }
+            else if (selectElement.value === 'stickersgifs') {
+                const fieldsToEnableForNeedHelp = ["id", "stepText", "nextStepID", "comment"];
+                fieldsToEnableForNeedHelp.forEach(fieldName => fields[fieldName].removeAttribute('disabled'));
+            }
+            else if (selectElement.value === 'set_of_additional_tasks') {
+                const fieldsToEnableForNeedHelp = ["id", "nextStepID", "setConditions", "comment"];
+                fieldsToEnableForNeedHelp.forEach(fieldName => fields[fieldName].removeAttribute('disabled'));
+            }
+            else if (selectElement.value !== '--') {
+                // Если выбрано что-то кроме "--", "open_question" и "need_help", активируем все поля (или какие-то другие поля по вашему выбору)
+                allFields.forEach(field => field.removeAttribute('disabled'));
+            }
+        }
+        
+        function removeRow(btnElement) {
+            const row = btnElement.closest("tr");
+            row.remove();
+            validateFields();
+        }
+
+        function validateFields() {
+            let allValid = true;
+
+            document.querySelectorAll("#mainTable tbody tr").forEach(row => {
+                const answerJsonField = row.querySelector('input[name="answerJson"]');
+                const almostCorrectField = row.querySelector('input[name="almostCorrect"]');
+                const setConditionsField = row.querySelector('input[name="setConditions"]');
+                const nextStepIDField = row.querySelector('input[name="nextStepID"]');
+
+                const answerIsValid = validateJsonField(answerJsonField);
+                const almostIsValid = validateJsonField(almostCorrectField);
+                const conditionsIsValid = validateJsonField(setConditionsField);
+                const nextStepIDIsValid = validateIDField(nextStepIDField);
+
+                const rowIsValid = answerIsValid && almostIsValid && conditionsIsValid && nextStepIDIsValid;
+
+                if (!rowIsValid) {
+                    allValid = false;
+                    // отключить все кнопки для этой строки
+                    row.querySelectorAll('td:first-child button').forEach(button => {
+                        button.setAttribute("disabled", "disabled");
+                    });
+                } else {
+                    // включить все кнопки для этой строки
+                    row.querySelectorAll('td:first-child button').forEach(button => {
+                        button.removeAttribute("disabled");
+                    });
+                }
+            });
+
+            const addRowButton = document.getElementById("addRowButton");
+            if (allValid) {
+                addRowButton.removeAttribute("disabled");
+            } else {
+                addRowButton.setAttribute("disabled", "disabled");
+            }
+        }
+
+
+        function validateJsonField(field) {
+            if (!field.value) {
+                field.classList.remove('invalid');
+                return true;
+            }
+
+            try {
+                JSON.parse(field.value);
+                field.classList.remove('invalid');
+                return true;
+            } catch {
+                field.classList.add('invalid');
+                return false;
+            }
+        }
+
+        function validateIDField(field) {
+            if (!field.value) {
+                field.classList.remove('invalid');
+                return true;
+            }
+
+            if (!Number.isInteger(parseInt(field.value))) {
+                field.classList.add('invalid');
+                return false;
+            } else {
+                field.classList.remove('invalid');
+                return true;
+            }
+        }
+        function wrapSelectedText(textarea, startTag, endTag) {
+            let start = textarea.selectionStart;
+            let end = textarea.selectionEnd;
+
+            // Если есть выделенный текст
+            if (start !== end) {
+                let selectedText = textarea.value.substring(start, end);
+                let beforeText = textarea.value.substring(0, start);
+                let afterText = textarea.value.substring(end, textarea.value.length);
+
+                // Замена выделенного текста
+                textarea.value = beforeText + startTag + selectedText + endTag + afterText;
+
+                // Восстановление позиции курсора
+                textarea.selectionStart = start;
+                textarea.selectionEnd = end + startTag.length + endTag.length;
+            }
+        }
+
+        document.getElementById('stepText').addEventListener('keydown', function(e) {
+            // Комбинация Ctrl + I или ⌘ + I
+            if ((e.ctrlKey || e.metaKey) && e.keyCode === 73) {
+                e.preventDefault();
+                wrapSelectedText(e.target, '<i>', '</i>');
+            }
+
+            // Комбинация Ctrl + B или ⌘ + B
+            if ((e.ctrlKey || e.metaKey) && e.keyCode === 66) {
+                e.preventDefault();
+                wrapSelectedText(e.target, '<b>', '</b>');
+            }
+        })
+
+        function displayThumbnails(inputElement) {
+          const thumbnailsDiv = inputElement.previousElementSibling;
+          thumbnailsDiv.innerHTML = '';  // очищаем блок с миниатюрами
+
+          const files = inputElement.files;
+
+          for (let i = 0; i < files.length; i++) {
+              const file = files[i];
+
+              if (file.type.startsWith('image/')) {
+                  const reader = new FileReader();
+
+                  reader.onload = function(e) {
+                      const img = document.createElement('img');
+                      img.src = e.target.result;
+                      img.width = 50;  // задаем ширину миниатюры
+                      img.alt = 'Uploaded image';
+                      thumbnailsDiv.appendChild(img);
+                  }
+
+                  reader.readAsDataURL(file);
+              }
+          }
+      }
+
+    </script>
+</body>
+
+</html>
