@@ -1,0 +1,73 @@
+body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+#sidebar {
+    width: 410px;
+    height: 100vh;
+    background-color: #333;
+    position: fixed;
+    left: 0;
+    top: 0;
+    overflow-y: auto;
+    resize: horizontal;
+    overflow: auto;
+}
+
+.submenu-item {
+    margin-left: 20px;          /* Отступ слева, чтобы показать вложенность */
+    background-color: #444;    /* Немного темнее, чем основные пункты меню */
+}
+
+.submenu-item:hover {
+    background-color: #666;    /* При наведении делаем цвет еще темнее */
+}
+
+
+#resizer {
+    cursor: ew-resize;
+    background-color: #555;
+    height: 100vh;
+    width: 5px;
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+#content {
+    margin-left: 415px;
+    padding: 20px;
+}
+
+.menu-item {
+    padding: 10px 20px;
+    color: white;
+    border-bottom: 1px solid #444;
+    text-decoration: none;
+    display: block;
+}
+
+.menu-item:hover {
+    background-color: #555;
+}
+
+.add-row, .delete-row, .move-up, .move-down, .add-row-lesson, .delete-row-lesson, .move-up-lesson, .move-down-lesson {
+    background: none;
+    float: right;
+    border: none;
+    color: white;
+    cursor: pointer;
+    font-size: 12px;
+    margin-left: 10px;
+}
+
+.add-row:hover, .delete-row:hover, .move-up:hover, .move-down:hover, .add-row-lesson:hover, .delete-row-lesson:hover, .move-up-lesson:hover, .move-down-lesson:hover {
+    color: #ddd;
+}
+
+#lessons {
+    display: none;
+}
+
